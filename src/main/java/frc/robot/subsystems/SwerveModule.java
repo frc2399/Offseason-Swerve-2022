@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
+//import jdk.nashorn.internal.ir.TryNode;
 
 public class SwerveModule {
 
@@ -32,6 +33,9 @@ public class SwerveModule {
     // private CANCoder canCoder;
     private Rotation2d offset;
 
+    private int tMotorID;
+    private int dMotorID;
+
     public SwerveModule(int dMotorID, int tMotorID, boolean driveMotorReversed, boolean turningMotorReversed,
     int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
 
@@ -45,6 +49,9 @@ public class SwerveModule {
 
         driveMotor.setInverted(driveMotorReversed);
         turningMotor.setInverted(turningMotorReversed);
+
+        this.dMotorID = dMotorID;
+        this.tMotorID = tMotorID;
 
 
 
@@ -68,7 +75,7 @@ public class SwerveModule {
     }
 
     public double getTurningPosition() {
-        return turningMotor.getSelectedSensorPosition(0);
+        return (turningMotor.getSelectedSensorPosition(0)/2048) * 2 * Math.PI;
     }
 
     public double getDriveVelocity() {
@@ -88,7 +95,8 @@ public class SwerveModule {
 
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
-        turningMotor.setSelectedSensorPosition(getAbsoluteEncoderRad());
+        //turningMotor.setSelectedSensorPosition(getAbsoluteEncoderRad());
+        turningMotor.setSelectedSensorPosition(0);
     }
 
     public SwerveModuleState getState() {
@@ -102,8 +110,20 @@ public class SwerveModule {
         }
         state = SwerveModuleState.optimize(state, getState().angle);
         driveMotor.set(TalonFXControlMode.PercentOutput, state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        turningMotor.set(TalonFXControlMode.PercentOutput, turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+        double turningPIDCalculation = turningPidController.calculate(getTurningPosition(), state.angle.getRadians());
+        turningMotor.set(TalonFXControlMode.PercentOutput, turningPIDCalculation);
+        if (tMotorID == DriveConstants. kFrontLeftTurningMotorPort)
+        {
+            SmartDashboard.putNumber("target setpoint", state.angle.getRadians());
+            SmartDashboard.putNumber("current angle", getTurningPosition());
+            SmartDashboard.putNumber("turning pid controller calculation", turningPIDCalculation);
+        }
         //SmartDashboard.putString("Swerve[" + ((AnalogInput) absoluteEncoder).getChannel() + "] state", state.toString());
+    }
+
+    public void setAngle(double angle) {
+        turningMotor.set(TalonFXControlMode.PercentOutput, turningPidController.calculate(getTurningPosition(), angle));
+        System.out.println("setAngle called");
     }
 
     public void stop() {
