@@ -64,7 +64,7 @@ public class SwerveModule {
         // turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad);
         // turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);
 
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
+        turningPidController = new PIDController(ModuleConstants.kPTurning, ModuleConstants.kITurning, ModuleConstants.kDTurning);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
@@ -75,7 +75,9 @@ public class SwerveModule {
     }
 
     public double getTurningPosition() {
-        return (turningMotor.getSelectedSensorPosition(0)/2048) * 2 * Math.PI;
+        double turningPosition = ((turningMotor.getSelectedSensorPosition(0)/2048) * 2 * Math.PI)/(157/1);
+        SmartDashboard.putNumber("Turning Position in Radians", turningPosition);
+        return ((turningMotor.getSelectedSensorPosition(0)/2048) * 2 * Math.PI)/(157/1);
     }
 
     public double getDriveVelocity() {
@@ -87,16 +89,20 @@ public class SwerveModule {
     }
 
     public double getAbsoluteEncoderRad() {
+        //double angle = absoluteEncoder.getAbsolutePosition();
         double angle = absoluteEncoder.getBusVoltage() / RobotController.getVoltage5V();
         angle *= 2.0 * Math.PI;
         angle -= absoluteEncoderOffsetRad;
-        return angle * (absoluteEncoderReversed ? -1.0 : 1.0);
+        angle = angle * (absoluteEncoderReversed ? -1.0 : 1.0);
+        SmartDashboard.putNumber("abs enc", angle);
+        System.out.println("abs enc " + angle );
+        return angle;
     }
 
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
-        //turningMotor.setSelectedSensorPosition(getAbsoluteEncoderRad());
-        turningMotor.setSelectedSensorPosition(0);
+        turningMotor.setSelectedSensorPosition(getAbsoluteEncoderRad());
+        //turningMotor.setSelectedSensorPosition(0);
     }
 
     public SwerveModuleState getState() {
