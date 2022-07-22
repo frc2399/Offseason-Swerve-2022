@@ -90,11 +90,11 @@ public class SwerveModule {
 
     public double getAbsoluteEncoderRad() {
         //double angle = absoluteEncoder.getAbsolutePosition();
-        double angle = absoluteEncoder.getBusVoltage() / RobotController.getVoltage5V();
-        angle *= 2.0 * Math.PI;
+        double angle = absoluteEncoder.getPosition();           //Returns Degrees
+        angle *= Math.PI/180;
         angle -= absoluteEncoderOffsetRad;
         angle = angle * (absoluteEncoderReversed ? -1.0 : 1.0);
-        SmartDashboard.putNumber("abs enc", angle);
+        //SmartDashboard.putNumber("abs enc", angle);
         System.out.println("abs enc " + angle );
         return angle;
     }
@@ -120,8 +120,9 @@ public class SwerveModule {
         turningMotor.set(TalonFXControlMode.PercentOutput, turningPIDCalculation);
         if (tMotorID == DriveConstants. kFrontLeftTurningMotorPort)
         {
-            SmartDashboard.putNumber("target setpoint", state.angle.getRadians());
-            SmartDashboard.putNumber("current angle", getTurningPosition());
+            SmartDashboard.putNumber("abs enc", getAbsoluteEncoderRad());
+            SmartDashboard.putNumber("target setpoint", state.angle.getDegrees());
+            SmartDashboard.putNumber("current angle", getTurningPosition() * 180/Math.PI);
             SmartDashboard.putNumber("turning pid controller calculation", turningPIDCalculation);
         }
         //SmartDashboard.putString("Swerve[" + ((AnalogInput) absoluteEncoder).getChannel() + "] state", state.toString());

@@ -34,7 +34,7 @@ public class RobotContainer {
                 () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
                 () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
                 () -> driverJoystickB.getRawAxis(OIConstants.kDriverRotAxis),
-                () -> !driverJoystickB.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                () -> driverJoystickB.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
         configureButtonBindings();
     }
@@ -44,6 +44,7 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, 10).whenPressed(() -> 
         {swerveSubsystem.frontLeft.setAngle(Math.PI/4);
         swerveSubsystem.frontLeft.resetEncoders();
+        System.out.println("Button 10 pressed!");
         }
         );
 
