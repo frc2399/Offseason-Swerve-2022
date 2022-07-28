@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.InputCmd;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -47,6 +48,11 @@ public class RobotContainer {
         System.out.println("Button 10 pressed!");
         }
         );
+
+        new JoystickButton(driverJoystick, 3).whileHeld(new InputCmd(swerveSubsystem, 0, 0, 0.4, false));
+        new JoystickButton(driverJoystick, 4).whileHeld(new InputCmd(swerveSubsystem, 0.5, 0, 0, false));
+        new JoystickButton(driverJoystick, 5).whileHeld(new InputCmd(swerveSubsystem, 0, 0.5, 0, false));
+
 
     }
 
